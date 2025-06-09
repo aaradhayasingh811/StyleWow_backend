@@ -1,57 +1,37 @@
-// const puppeteer = require('puppeteer');
-// const path = require('path');
-// const fs = require('fs');
-
-// async function getBrowserPath() {
-//   const basePath = '/mnt/data/puppeteer-cache';
-//   const version = '137.0.7151.55'; // This matches Puppeteer's expected Chrome version
-//   const executablePath = path.join(basePath, 'chrome', `linux-${version}`, 'chrome-linux', 'chrome');
-
-//   if (!fs.existsSync(executablePath)) {
-//     throw new Error('❌ Chrome not found at: ' + executablePath);
-//   }
-
-//   return executablePath;
-// }
-
-// const launchBrowser = async () => {
-//   const executablePath = await getBrowserPath();
-
-//   return puppeteer.launch({
-//     headless: true,
-//     executablePath,
-//     args: ['--no-sandbox', '--disable-setuid-sandbox']
-//   });
-// };
-
-// module.exports = launchBrowser;
-
 const puppeteer = require('puppeteer');
+const fs = require('fs');
 
 async function getBrowserPath() {
-  // On Render.com, Chrome is pre-installed here:
-  const renderChromePath = '/usr/bin/google-chrome';
-  
-  // For local development, use Puppeteer's downloaded Chrome
-  const localChromePath = puppeteer.executablePath();
+  const possiblePaths = [
+    '/usr/bin/google-chrome',
+    '/usr/bin/chromium-browser'
+  ];
 
-  // Check if we're on Render.com
-  if (process.env.RENDER) {
-    return renderChromePath;
+  for (const path of possiblePaths) {
+    if (fs.existsSync(path)) {
+      return path;
+    }
   }
-  
-  return localChromePath;
+
+  // fallback to Puppeteer's bundled chromium path
+  const puppeteerPath = puppeteer.executablePath();
+  if (fs.existsSync(puppeteerPath)) {
+    return puppeteerPath;
+  }
+
+  throw new Error('❌ Chrome not found in any standard location');
 }
 
 const launchBrowser = async () => {
+  const executablePath = await getBrowserPath();
+
   return puppeteer.launch({
-    headless: 'new', // Recommended new headless mode
-    executablePath: await getBrowserPath(),
+    headless: 'new',
+    executablePath,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage', // Important for Render.com's limited memory
-      '--single-process' // May help in memory-constrained environments
+      '--disable-dev-shm-usage'
     ]
   });
 };
