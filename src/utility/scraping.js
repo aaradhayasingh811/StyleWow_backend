@@ -160,7 +160,12 @@ const parseProducts = ($, selector, site, config) => {
 
 const scrapeAmazon = async (query, config) => {
   console.log("Starting Amazon scraping...");
-  const browser = await puppeteer.launch({ headless: "new" });
+  // const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({
+  headless: true, // standard mode, not "new"
+  args: ['--no-sandbox', '--disable-setuid-sandbox'] // required for many hosting platforms
+});
+
   const page = await browser.newPage();
   
   try {
@@ -204,7 +209,12 @@ const scrapeAmazon = async (query, config) => {
 
 const scrapeFlipkart = async (query, config) => {
   console.log("Starting Flipkart scraping...");
-  const browser = await puppeteer.launch({ headless: "new" });
+  // const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({
+  headless: true, // standard mode, not "new"
+  args: ['--no-sandbox', '--disable-setuid-sandbox'] // required for many hosting platforms
+});
+
   const page = await browser.newPage();
 
   try {
@@ -297,7 +307,12 @@ const scrapeFlipkart = async (query, config) => {
 
 const scrapeMyntra = async (query,config) => {
   console.log("Starting Myntra scraping...");
-  const browser = await puppeteer.launch({ headless: "new" });
+  // const browser = await puppeteer.launch({ headless: "new" });
+  const browser = await puppeteer.launch({
+  headless: true, // standard mode, not "new"
+  args: ['--no-sandbox', '--disable-setuid-sandbox'] // required for many hosting platforms
+});
+
   const page = await browser.newPage();
   await page.setUserAgent(config.userAgent);
 

@@ -13,6 +13,7 @@ const setTokenCookie = (res, token) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'None',
+    // sameSite: 'Strict',
     maxAge: 60 * 60 * 1000*27, // 1 day
   });
 };
