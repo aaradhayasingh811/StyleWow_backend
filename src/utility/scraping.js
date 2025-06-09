@@ -488,6 +488,7 @@ const calculateMatchScore = (product, preferences) => {
 };
 
 const parseProducts = ($, selector, site, config) => {
+  console.log("selector",selector , "and the site is",site);
   const results = [];
   
   $(selector).each((_, el) => {
