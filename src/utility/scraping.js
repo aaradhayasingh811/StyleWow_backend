@@ -85,10 +85,87 @@ const calculateMatchScore = (product, preferences) => {
   return score;
 };
 
+// const parseProducts = ($, selector, site, config) => {
+//   const results = [];
+  
+//   $(selector).each((_, el) => {
+//     let title = "";
+//     let link = "";
+//     let image = "";
+//     let priceText = "";
+
+//     try {
+//       if (site === "amazon") {
+//         title = $(el).find("h2.a-size-base-plus span").first().text().trim();
+//         link = `https://www.amazon.in${$(el)
+//           .find("a.a-link-normal.s-no-hover.s-underline-text.s-underline-link-text.s-link-style.a-text-normal")
+//           .attr("href")}`;
+//         image = $(el).find("img.s-image").attr("src") || "";
+//         priceText = $(el)
+//           .find("span.a-price-whole")
+//           .text()
+//           .replace(/[₹,]/g, "")
+//           .trim();
+//       } 
+//       else if (site === "myntra") {
+//         const brand = $(el).find("h3.product-brand").text().trim();
+//         const productName = $(el).find("h4.product-product").text().trim();
+//         title = `${brand} ${productName}`;
+//         const relativeLink = $(el).find("a").attr("href");
+//         link = relativeLink ? `https://www.myntra.com${relativeLink}` : "";
+//         image = $(el).find("img.img-responsive").attr("src") || "";
+//         priceText = $(el)
+//           .find("span.product-discountedPrice")
+//           .text()
+//           .replace(/[^0-9]/g, "")
+//           .trim();
+//         console.log(priceText)
+//       } 
+//       else if (site === "flipkart") {
+//         console.log("flip")
+//         const brand = $(el).find(".syl9yP").text().trim();
+//         const productName = $(el).find("a.WKTcLC").text().trim();
+//         title = `${brand} ${productName}`;
+//         const relativeLink = $(el).find("a.WKTcLC").attr("href");
+//         link = relativeLink ? `https://www.flipkart.com${relativeLink}` : "";
+//         image = $(el).find("img._53J4C-").attr("src") || "";
+//         priceText = $(el)
+//           .find(".Nx9bqj")
+//           .first()
+//           .text()
+//           .replace(/[₹,]/g, "")
+//           .trim();
+//       }
+
+//       const price = parseInt(priceText, 10) || 0;
+//       const brand = site;
+
+//       if (title && !isNaN(price) ){
+//         if (price >= config.minPrice && price <= config.maxPrice) {
+//           results.push({
+//             title,
+//             image,
+//             link,
+//             price,
+//             description: title,
+//             brand
+//           });
+//         }
+//       }
+//     } catch (error) {
+//       console.error(`Error parsing product for ${site}:`, error);
+//     }
+//   });
+
+//   return results;
+// };
+
 const parseProducts = ($, selector, site, config) => {
   const results = [];
-  
-  $(selector).each((_, el) => {
+  console.log(`\n🔍 Starting to parse products for: ${site.toUpperCase()}`);
+
+  $(selector).each((index, el) => {
+    console.log(`\n📦 Processing ${site} product #${index + 1}`);
     let title = "";
     let link = "";
     let image = "";
@@ -96,6 +173,7 @@ const parseProducts = ($, selector, site, config) => {
 
     try {
       if (site === "amazon") {
+        console.log("🛒 Site: Amazon");
         title = $(el).find("h2.a-size-base-plus span").first().text().trim();
         link = `https://www.amazon.in${$(el)
           .find("a.a-link-normal.s-no-hover.s-underline-text.s-underline-link-text.s-link-style.a-text-normal")
@@ -106,8 +184,11 @@ const parseProducts = ($, selector, site, config) => {
           .text()
           .replace(/[₹,]/g, "")
           .trim();
+
+        console.log({ title, link, image, priceText });
       } 
       else if (site === "myntra") {
+        console.log("🛍️ Site: Myntra");
         const brand = $(el).find("h3.product-brand").text().trim();
         const productName = $(el).find("h4.product-product").text().trim();
         title = `${brand} ${productName}`;
@@ -119,10 +200,11 @@ const parseProducts = ($, selector, site, config) => {
           .text()
           .replace(/[^0-9]/g, "")
           .trim();
-        console.log(priceText)
+
+        console.log({ title, link, image, priceText });
       } 
       else if (site === "flipkart") {
-        console.log("flip")
+        console.log("📱 Site: Flipkart");
         const brand = $(el).find(".syl9yP").text().trim();
         const productName = $(el).find("a.WKTcLC").text().trim();
         title = `${brand} ${productName}`;
@@ -135,13 +217,21 @@ const parseProducts = ($, selector, site, config) => {
           .text()
           .replace(/[₹,]/g, "")
           .trim();
+
+        console.log(`🧾 Brand + Product: ${title}`);
+        console.log(`🔗 Link: ${link}`);
+        console.log(`🖼️ Image: ${image}`);
+        console.log(`💰 Price Text: ${priceText}`);
       }
 
       const price = parseInt(priceText, 10) || 0;
       const brand = site;
 
-      if (title && !isNaN(price) ){
+      console.log(`✅ Final Values -> Title: ${title}, Price: ${price}`);
+
+      if (title && !isNaN(price)) {
         if (price >= config.minPrice && price <= config.maxPrice) {
+          console.log("✅ Product within price range. Adding to results.");
           results.push({
             title,
             image,
@@ -150,15 +240,22 @@ const parseProducts = ($, selector, site, config) => {
             description: title,
             brand
           });
+        } else {
+          console.log("❌ Price out of specified range. Skipping.");
         }
+      } else {
+        console.log("❌ Missing or invalid title/price. Skipping.");
       }
     } catch (error) {
-      console.error(`Error parsing product for ${site}:`, error);
+      console.error(`❗ Error parsing ${site} product #${index + 1}:`, error);
     }
   });
 
+  console.log(`\n✅ Finished parsing ${site.toUpperCase()}. Total results: ${results.length}`);
   return results;
 };
+
+
 
 const scrapeAmazon = async (query, config) => {
   console.log("Starting Amazon scraping...");
@@ -325,7 +422,6 @@ const scrapeMyntra = async (query,config) => {
 
     const content = await page.content();
     const $ = cheerio.load(content);
-    console.log("hit"); // <- should now run
     const products = parseProducts($, "li.product-base", "myntra",config);
     console.log(products.length, "products found on myntra");
     return products.slice(0, config.maxProducts);
