@@ -9,7 +9,10 @@ async function findChrome() {
     '/usr/bin/google-chrome-stable',
     '/usr/bin/chrome',
     'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
+    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    '/opt/render/project/.render/chrome/opt/google/chrome/',
+    '/path/to/your/chrome/executable',
+    '/opt/render/.cache/puppeteer'
   ];
 
   for (const path of possiblePaths) {
